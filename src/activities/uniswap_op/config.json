@@ -1,0 +1,8 @@
+{
+    "ACTIVITY_NAME": "uniswap_op",
+    "DISPLAY_NAME": "Uniswap",
+    "DATE_START": "2023-02-01 00:00:00",
+    "DATE_END": "2023-03-01 00:00:00",
+    "TAGS": ["DEX", "Optimism"],
+    "ACTIVE": 1
+}
