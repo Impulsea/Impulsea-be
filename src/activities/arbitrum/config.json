@@ -1,8 +1,8 @@
 {
     "ACTIVITY_NAME": "arbitrum_chain",
     "DISPLAY_NAME": "Arbitrum",
-    "DATE_START": "2023-01-01 00:00:00",
-    "DATE_END": "2023-02-01 00:00:00",
+    "DATE_START": "2023-11-01 00:00:00",
+    "DATE_END": "2023-12-01 00:00:00",
     "TAGS": ["blockchain"],
     "ACTIVE": 1
 }
