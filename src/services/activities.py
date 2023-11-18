@@ -39,12 +39,17 @@ class Activities:
         self.activities = {}
         for entry in os.listdir(self.ROOT_DIR):
             config = _process_config_file(self.ROOT_DIR, entry, 'config.json')
-            for py_file in ['leaderboard.py', 'wallet_checker.py']:
+            for py_file in [
+                'leaderboard.py',
+                'wallet_checker.py',
+                'stats.py',
+            ]:
                 module = _process_py_file(self.ROOT_DIR, entry, py_file)
                 try:
                     config[py_file.replace('.py', '')] = module
                 except Exception as e:
                     logging.error(py_file, e)
+
             try:
                 self.activities[config['ACTIVITY_NAME']] = config
             except Exception as e:
@@ -66,6 +71,18 @@ class Activities:
             })
 
         return all_activities
+
+
+    def get_activity_stats(self, activity):
+        stats = self.activities[activity]["stats"].get_stats()
+        common_stats = self.activities[activity]
+        return {
+            "DISPLAY_NAME": common_stats.get("DISPLAY_NAME"),
+            "DATE_START": common_stats.get("DATE_START"),
+            "DATE_END": common_stats.get("DATE_END"),
+            "TAGS": common_stats.get("TAGS"),
+            **stats
+        }
 
 
     def get_activity_leaderboard(self, activity):

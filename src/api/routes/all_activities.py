@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 
 from api.dependencies import get_all_activities_service
 from services.activities import Activities

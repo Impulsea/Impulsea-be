@@ -10,6 +10,10 @@ def get_all_activities_service() -> Activities:
     return Activities()
 
 
+def get_activity_stats_service() -> Activities:
+    return Activities()
+
+
 def get_activity_leaderboard_service() -> Activities:
     return Activities()
 
