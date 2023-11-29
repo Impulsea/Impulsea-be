@@ -21,8 +21,8 @@ def _process_config_file(root: str, entry: str, file: str):
         print(f"Error loading JSON from {file_path}: {e}")
     except FileNotFoundError as e:
         print(f"File not found: {e}")
-        
-        
+
+
 def _process_py_file(root: str, entry: str, file: str):
     file_path = os.path.join(root, entry, file)
     try:
@@ -55,9 +55,8 @@ class Activities:
             except Exception as e:
                 logging.error(e)
 
-
     def get_all_activities(self):
-        
+
         all_activities = []
 
         for activity_name in self.activities:
@@ -72,7 +71,6 @@ class Activities:
 
         return all_activities
 
-
     def get_activity_stats(self, activity):
         stats = self.activities[activity]["stats"].get_stats()
         common_stats = self.activities[activity]
@@ -84,11 +82,8 @@ class Activities:
             **stats
         }
 
-
     def get_activity_leaderboard(self, activity):
         return self.activities[activity]["leaderboard"].get_lb()
-    
 
     def get_activity_wallet_score(self, activity, address):
         return self.activities[activity]["wallet_checker"].get_wallet_score(address)
-         

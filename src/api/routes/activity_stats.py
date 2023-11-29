@@ -10,7 +10,7 @@ router = APIRouter(
 
 
 @router.get("/activity_stats")
-async def activity_stats(
+async def get_activity_stats(
     activity: str = Query(...),
     ativitity_stats_service: Activities = Depends(get_activity_stats_service)
 ):
