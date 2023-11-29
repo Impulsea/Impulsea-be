@@ -25,4 +25,3 @@ def get_lb():
             "Total XP": 140.89
         },
     ]
-

@@ -5,12 +5,12 @@ from services.activities import Activities
 
 
 router = APIRouter(
-    tags=["LB"]
+    tags=["Activity"]
 )
 
 
 @router.get("/leaderboard")
-async def leaderbaord(
+async def get_leaderbaord(
     activity: str = Query(...),
     get_activity_leaderboard_service: Activities = Depends(get_activity_leaderboard_service)
 ):

@@ -26,7 +26,9 @@ def get_wallet_score(address: str):
     competitors_activity = res[0].get("competitors_activity", 0)
     sybil_likelihood = res[0].get("sybil_likelihood", 0)
 
-    total_xp = 10 * (program_engagement + protocol_activity + competitors_activity + sybil_likelihood)
+    total_xp = 10 * (
+        program_engagement + protocol_activity + competitors_activity + sybil_likelihood
+    )
 
     return {
         "Address": address,

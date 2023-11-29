@@ -10,7 +10,7 @@ router = APIRouter(
 
 
 @router.get("/healthcheck")
-async def healthcheck(
+async def get_healthcheck(
     healthCheck_service: HealthCheck = Depends(healthcheck)
 ):
     return healthCheck_service.healthcheck()

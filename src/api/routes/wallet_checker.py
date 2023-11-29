@@ -5,12 +5,12 @@ from services.activities import Activities
 
 
 router = APIRouter(
-    tags=["LB"]
+    tags=["Activity"]
 )
 
 
 @router.get("/activity_wallet_checker")
-async def wallet_checker(
+async def get_wallet_checker(
     activity: str = Query(...),
     address: str = Query(...),
     get_activity_wallet_checker_service: Activities = Depends(get_activity_wallet_checker_service)
