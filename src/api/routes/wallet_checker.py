@@ -6,6 +6,7 @@ from exceptions.exceptions import (
     ActivityNotExistError,
     EmptyQueryResultError,
     FailedQueryError,
+    WalletScoringError
 )
 
 
@@ -18,13 +19,15 @@ router = APIRouter(
 async def get_wallet_checker(
     activity: str = Query(...),
     address: str = Query(...),
-    get_activity_wallet_checker_service: Activities = Depends(get_activity_wallet_checker_service)
+    activity_wallet_checker_service: Activities = Depends(get_activity_wallet_checker_service)
 ):
     try:
-        return get_activity_wallet_checker_service.get_activity_wallet_score(activity, address)
+        return activity_wallet_checker_service.get_activity_wallet_score(activity, address)
     except ActivityNotExistError as err:
         raise HTTPException(status_code=err.error_code(), detail=str(err))
     except FailedQueryError as err:
         raise HTTPException(status_code=err.error_code(), detail=str(err))
     except EmptyQueryResultError as err:
+        raise HTTPException(status_code=err.error_code(), detail=str(err))
+    except WalletScoringError as err:
         raise HTTPException(status_code=err.error_code(), detail=str(err))

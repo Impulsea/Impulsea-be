@@ -31,10 +31,10 @@ def get_wallet_score(address: str):
         }
 
     # address = res[0].get("address", 0)
-    program_engagement = res[0].get("program_engagement", 0)
-    protocol_activity = res[0].get("protocol_activity", 0)
-    competitors_activity = res[0].get("competitors_activity", 0)
-    sybil_likelihood = res[0].get("sybil_likelihood", 0)
+    program_engagement = res[0].get("program_engagement", 0) or 0
+    protocol_activity = res[0].get("protocol_activity", 0) or 0
+    competitors_activity = res[0].get("competitors_activity", 0) or 0
+    sybil_likelihood = res[0].get("sybil_likelihood", 0) or 0
 
     total_xp = 10 * (
         program_engagement + protocol_activity + competitors_activity + sybil_likelihood
