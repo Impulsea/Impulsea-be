@@ -20,7 +20,17 @@ def get_wallet_score(address: str):
         client=cli
     )
 
-    address = res[0].get("address", 0)
+    if len(res) == 0:
+        return {
+            "Address": address,
+            "Program Engegement":  0,
+            "Protocol Activity": 0,
+            "Competitors Activity": 0,
+            "Sybil Likelihood": 0,
+            "Total XP": 0
+        }
+
+    # address = res[0].get("address", 0)
     program_engagement = res[0].get("program_engagement", 0)
     protocol_activity = res[0].get("protocol_activity", 0)
     competitors_activity = res[0].get("competitors_activity", 0)

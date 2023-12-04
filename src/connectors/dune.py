@@ -1,6 +1,7 @@
 import logging
 
 from dune_client.query import QueryBase
+from exceptions.exceptions import FailedQueryError, EmptyQueryResultError
 
 
 def dune_request(
@@ -16,8 +17,15 @@ def dune_request(
         query_id=query_id,
         params=params
     )
-    result = client.run_query(query)
+
+    try:
+        result = client.run_query(query)
+    except Exception as e:
+        logging.error(e)
+        raise FailedQueryError()
+
     if not result.state.is_complete():
-        logging.ERROR(f'Cant complete the query. {result.query_id}')
-        return []
+        logging.error(f'Cant complete the query. {result.query_id}')
+        raise EmptyQueryResultError()
+
     return result.result.rows
