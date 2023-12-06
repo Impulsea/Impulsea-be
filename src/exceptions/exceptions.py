@@ -20,3 +20,11 @@ class EmptyQueryResultError(Exception):
 
     def error_code(self):
         return 404
+
+
+class WalletScoringError(Exception):
+    def __init__(self):
+        super().__init__("Cant score a given address")
+
+    def error_code(self):
+        return 400

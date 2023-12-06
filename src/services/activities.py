@@ -3,7 +3,11 @@ import json
 import logging
 import importlib.util
 
-from exceptions.exceptions import ActivityNotExistError
+from exceptions.exceptions import (
+    ActivityNotExistError,
+    WalletScoringError,
+    FailedQueryError
+)
 
 
 class Activities:
@@ -94,4 +98,10 @@ class Activities:
     def get_activity_wallet_score(self, activity, address):
         if activity not in self.activities:
             raise ActivityNotExistError(activity=activity)
-        return self.activities[activity]["wallet_checker"].get_wallet_score(address)
+        try:
+            return self.activities[activity]["wallet_checker"].get_wallet_score(address)
+        except FailedQueryError:
+            raise FailedQueryError()
+        except Exception as e:
+            logging.error(e)
+            raise WalletScoringError()
