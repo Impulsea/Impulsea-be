@@ -1,9 +1,16 @@
-from pathlib import Path
-
 import psycopg2
 
+from pathlib import Path
+import logging
+import os
 
-def execute_sql_file(sql_file_path, connection_params):
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+def execute_sql_file(sql_file_path: str, connection_params: dict) -> None:
     # Read SQL file content
     with open(sql_file_path, "r") as file:
         sql_script = file.read()
@@ -19,27 +26,22 @@ def execute_sql_file(sql_file_path, connection_params):
         # Commit the changes
         connection.commit()
 
-        print("SQL script executed successfully.")
+        logger.info("SQL script executed successfully.")
 
+        cursor.close()
+        connection.close()
     except (psycopg2.Error, Exception) as e:
-        print(f"Error executing SQL script: {e}")
-
-    finally:
-        # Close the cursor and connection
-        if cursor:
-            cursor.close()
-        if connection:
-            connection.close()
+        logger.error(f"Error executing SQL script: {e}")
 
 
 def main() -> None:
     # Replace these parameters with your own database connection details
     connection_parameters = {
-        "dbname": "your_database_name",
-        "user": "your_username",
-        "password": "your_password",
-        "host": "your_host",
-        "port": "your_port",
+        "dbname": os.getenv("DB_NAME"),
+        "user": os.getenv("DB_USER"),
+        "password": os.getenv("DB_PASSWORD"),
+        "host": os.getenv("DB_HOST"),
+        "port": os.getenv("DB_PORT"),
     }
 
     # Input the path to your SQL file
@@ -47,7 +49,7 @@ def main() -> None:
 
     # Check if the file exists
     if not Path(sql_file_path).is_file():
-        print(f"Error: The file '{sql_file_path}' does not exist.")
+        logger.error(f"Error: The file '{sql_file_path}' does not exist.")
     else:
         # Execute the SQL file
         execute_sql_file(sql_file_path, connection_parameters)
