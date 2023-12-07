@@ -9,7 +9,7 @@ class AddressService(BaseDbService):
         rows = self.session.execute(
             text(
                 """
-                SELECT * from 
+                SELECT * from
                 FROM addresses
                 WHERE addresses.id = :_id
                 """
