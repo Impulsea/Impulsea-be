@@ -8,13 +8,15 @@ from exceptions.exceptions import (
     WalletScoringError,
     FailedQueryError
 )
+from services.db.address import AddressService
 
 
 class Activities:
 
     ROOT_DIR = "activities/"
 
-    def __init__(self):
+    def __init__(self, address_service: AddressService):
+        self.address_service = address_service
         self.activities = {}
         for entry in os.listdir(self.ROOT_DIR):
             config = Activities._process_config_file(self.ROOT_DIR, entry, 'config.json')

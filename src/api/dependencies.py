@@ -1,22 +1,17 @@
 from services.healthcheck import HealthCheck
 from services.activities import Activities
+from services.db.address import AddressService
+from db.session import session_maker
 
 
 def healthcheck() -> HealthCheck:
     return HealthCheck()
 
 
-def get_all_activities_service() -> Activities:
-    return Activities()
-
-
-def get_activity_stats_service() -> Activities:
-    return Activities()
-
-
-def get_activity_leaderboard_service() -> Activities:
-    return Activities()
-
-
-def get_activity_wallet_checker_service() -> Activities:
-    return Activities()
+def get_activities_service() -> Activities:
+    address_service = AddressService(
+        session=session_maker()
+    )
+    return Activities(
+        address_service=address_service
+    )
