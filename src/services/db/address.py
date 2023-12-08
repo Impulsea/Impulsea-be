@@ -1,20 +1,61 @@
+from datetime import datetime
 from sqlalchemy import text
 
 from services.db.base import BaseDbService
 
 
-class AddressService(BaseDbService):
+class DBSAddressService(BaseDbService):
 
-    def get_address_by_id(self, id: int):
+    def save_scored_address(
+        self,
+        address: str,
+        activity_name: str,
+        protocol_activity: float,
+        competitors_activity: float,
+        program_engagement: float,
+        sybil_likelihood: float
+    ):
+
         rows = self.session.execute(
             text(
                 """
-                SELECT * from
-                FROM addresses
-                WHERE addresses.id = :_id
+                SELECT activity_id
+                FROM activities
+                WHERE activity_name = :activity_name;
                 """
-            ), params={"_id": id}
+            ), params={"activity_name": activity_name}
         )
-        result = rows.fetchall()
-        # или result = rows.scalars().all()
-        print(result)
+        activity_id = rows.fetchall()[0][0]
+
+        self.session.execute(
+            text(
+                """
+                INSERT INTO wallet_scorings (
+                    activity_id,
+                    wallet,
+                    protocol_activity,
+                    competitors_activity,
+                    program_engagement,
+                    sybil_likelihood,
+                    dt
+                ) VALUES (
+                    :activity_id,
+                    :wallet,
+                    :protocol_activity,
+                    :competitors_activity,
+                    :program_engagement,
+                    :sybil_likelihood,
+                    :dt
+                )
+                """
+            ), {
+                "activity_id": activity_id,
+                "wallet": address,
+                "protocol_activity": protocol_activity,
+                "competitors_activity": competitors_activity,
+                "program_engagement": program_engagement,
+                "sybil_likelihood": sybil_likelihood,
+                "dt": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+               })
+
+        self.session.commit()

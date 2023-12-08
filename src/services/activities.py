@@ -8,20 +8,26 @@ from exceptions.exceptions import (
     WalletScoringError,
     FailedQueryError
 )
-from services.db.address import AddressService
+from services.db.address import DBSAddressService
+from services.db.leaderboard import DBLeaderboardService
 
 
 class Activities:
 
     ROOT_DIR = "activities/"
 
-    def __init__(self, address_service: AddressService):
-        self.address_service = address_service
+    def __init__(
+        self,
+        db_address_service: DBSAddressService,
+        db_leaderboard_service: DBLeaderboardService
+    ):
+        self.db_address_service = db_address_service
+        self.db_leaderboard_service = db_leaderboard_service
         self.activities = {}
+
         for entry in os.listdir(self.ROOT_DIR):
             config = Activities._process_config_file(self.ROOT_DIR, entry, 'config.json')
             for py_file in [
-                'leaderboard.py',
                 'wallet_checker.py',
                 'stats.py',
             ]:
@@ -32,7 +38,7 @@ class Activities:
                     logging.error(py_file, e)
 
             try:
-                self.activities[config['ACTIVITY_NAME']] = config
+                self.activities[config['activity_name']] = config
             except Exception as e:
                 logging.error(e)
 
@@ -70,11 +76,13 @@ class Activities:
         for activity_name in self.activities:
             activity = self.activities[activity_name]
             all_activities.append({
-                "ACTIVITY_NAME": activity.get("ACTIVITY_NAME"),
-                "DISPLAY_NAME": activity.get("DISPLAY_NAME"),
-                "DATE_START": activity.get("DATE_START"),
-                "DATE_END": activity.get("DATE_END"),
-                "TAGS": activity.get("TAGS"),
+                "activity_name": activity.get("activity_name"),
+                "display_name": activity.get("display_name"),
+                "date_start": activity.get("date_start"),
+                "date_end": activity.get("date_end"),
+                "tags": activity.get("tags"),
+                "logo_url": activity.get("logo_url"),
+                "website_url": activity.get("website_url")
             })
 
         return all_activities
@@ -85,23 +93,36 @@ class Activities:
         stats = self.activities[activity]["stats"].get_stats()
         common_stats = self.activities[activity]
         return {
-            "DISPLAY_NAME": common_stats.get("DISPLAY_NAME"),
-            "DATE_START": common_stats.get("DATE_START"),
-            "DATE_END": common_stats.get("DATE_END"),
-            "TAGS": common_stats.get("TAGS"),
+            "display_name": common_stats.get("display_name"),
+            "date_start": common_stats.get("date_start"),
+            "date_end": common_stats.get("date_end"),
+            "tags": common_stats.get("tags"),
             **stats
         }
 
     def get_activity_leaderboard(self, activity):
         if activity not in self.activities:
             raise ActivityNotExistError(activity=activity)
-        return self.activities[activity]["leaderboard"].get_lb()
+
+        # TODO: add exception
+        lb = self.db_leaderboard_service.get_leaderboard(activity_name=activity)
+        return lb
 
     def get_activity_wallet_score(self, activity, address):
         if activity not in self.activities:
             raise ActivityNotExistError(activity=activity)
         try:
-            return self.activities[activity]["wallet_checker"].get_wallet_score(address)
+            scores = self.activities[activity]["wallet_checker"].get_wallet_score(address)
+            # TODO: add custom exception
+            self.db_address_service.save_scored_address(
+                address=address,
+                activity_name=activity,
+                protocol_activity=scores["Protocol Activity"],
+                program_engagement=scores["Program Engegement"],
+                competitors_activity=scores["Competitors Activity"],
+                sybil_likelihood=scores["Sybil Likelihood"]
+            )
+            return scores
         except FailedQueryError:
             raise FailedQueryError()
         except Exception as e:

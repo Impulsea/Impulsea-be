@@ -1,6 +1,7 @@
 from services.healthcheck import HealthCheck
 from services.activities import Activities
-from services.db.address import AddressService
+from services.db.address import DBSAddressService
+from services.db.leaderboard import DBLeaderboardService
 from db.session import session_maker
 
 
@@ -9,9 +10,12 @@ def healthcheck() -> HealthCheck:
 
 
 def get_activities_service() -> Activities:
-    address_service = AddressService(
-        session=session_maker()
-    )
+
+    session = session_maker()
+    db_address_service = DBSAddressService(session)
+    db_leaderboard_service = DBLeaderboardService(session)
+
     return Activities(
-        address_service=address_service
+        db_address_service=db_address_service,
+        db_leaderboard_service=db_leaderboard_service
     )

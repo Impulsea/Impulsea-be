@@ -1,7 +1,7 @@
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from config import config
+from config import POSTGRES_URI
 
 
 def create_sessionmaker(postgres_uri: str) -> sessionmaker[Session]:
@@ -11,4 +11,4 @@ def create_sessionmaker(postgres_uri: str) -> sessionmaker[Session]:
     )
 
 
-session_maker = create_sessionmaker(config.postgres_uri)
+session_maker = create_sessionmaker(POSTGRES_URI)

@@ -1,8 +1,8 @@
 def get_stats():
     return {
-        'retention': 1,
-        'stikiness': 1,
-        'high_engaged': 100,
-        'med_engaged': 500,
-        'low_engaged': 1000
+        'retention': 0.42,
+        'stikiness': 0.6,
+        'high_engaged': 376,
+        'med_engaged': 1082,
+        'low_engaged': 6099
     }
