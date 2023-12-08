@@ -8,7 +8,7 @@ from exceptions.exceptions import (
     WalletScoringError,
     FailedQueryError
 )
-from services.db.address import DBSAddressService
+from services.db.address import DBAddressService
 from services.db.leaderboard import DBLeaderboardService
 
 
@@ -18,7 +18,7 @@ class Activities:
 
     def __init__(
         self,
-        db_address_service: DBSAddressService,
+        db_address_service: DBAddressService,
         db_leaderboard_service: DBLeaderboardService
     ):
         self.db_address_service = db_address_service
@@ -97,6 +97,8 @@ class Activities:
             "date_start": common_stats.get("date_start"),
             "date_end": common_stats.get("date_end"),
             "tags": common_stats.get("tags"),
+            "logo_url": common_stats.get("logo_url"),
+            "website_url": common_stats.get("website_url"),
             **stats
         }
 

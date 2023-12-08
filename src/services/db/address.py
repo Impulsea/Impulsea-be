@@ -4,7 +4,22 @@ from sqlalchemy import text
 from services.db.base import BaseDbService
 
 
-class DBSAddressService(BaseDbService):
+class DBActivityService(BaseDbService):
+
+    def get_activity_id_by_name(self, activity_name):
+        rows = self.session.execute(
+            text(
+                """
+                SELECT activity_id
+                FROM activities
+                WHERE activity_name = :activity_name;
+                """
+            ), params={"activity_name": activity_name}
+        )
+        return rows.fetchall()[0][0]
+
+
+class DBAddressService(DBActivityService):
 
     def save_scored_address(
         self,
@@ -16,16 +31,7 @@ class DBSAddressService(BaseDbService):
         sybil_likelihood: float
     ):
 
-        rows = self.session.execute(
-            text(
-                """
-                SELECT activity_id
-                FROM activities
-                WHERE activity_name = :activity_name;
-                """
-            ), params={"activity_name": activity_name}
-        )
-        activity_id = rows.fetchall()[0][0]
+        activity_id = self.get_activity_id_by_name(activity_name=activity_name)
 
         self.session.execute(
             text(
