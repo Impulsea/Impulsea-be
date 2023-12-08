@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 
-from api.dependencies import get_activity_leaderboard_service
+from api.dependencies import get_activities_service
 from services.activities import Activities
 from exceptions.exceptions import ActivityNotExistError
 
@@ -12,7 +12,7 @@ router = APIRouter(
 @router.get("/leaderboard")
 async def get_leaderbaord(
     activity: str = Query(...),
-    activity_leaderboard_service: Activities = Depends(get_activity_leaderboard_service)
+    activity_leaderboard_service: Activities = Depends(get_activities_service)
 ):
     try:
         return activity_leaderboard_service.get_activity_leaderboard(activity)

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 
-from api.dependencies import get_activity_stats_service
+from api.dependencies import get_activities_service
 from services.activities import Activities
 from exceptions.exceptions import ActivityNotExistError
 
@@ -13,7 +13,7 @@ router = APIRouter(
 @router.get("/activity_stats")
 async def get_activity_stats(
     activity: str = Query(...),
-    ativitity_stats_service: Activities = Depends(get_activity_stats_service)
+    ativitity_stats_service: Activities = Depends(get_activities_service)
 ):
     try:
         return ativitity_stats_service.get_activity_stats(activity)
