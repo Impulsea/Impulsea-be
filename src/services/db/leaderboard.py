@@ -1,9 +1,9 @@
 from sqlalchemy import text
 
-from services.db.base import BaseDbService
+from services.db.address import DBActivityService
 
 
-class DBLeaderboardService(BaseDbService):
+class DBLeaderboardService(DBActivityService):
 
     def get_leaderboard(
         self,
@@ -11,16 +11,7 @@ class DBLeaderboardService(BaseDbService):
         n_rows: int = 10
     ):
 
-        rows = self.session.execute(
-            text(
-                """
-                SELECT activity_id
-                FROM activities
-                WHERE activity_name = :activity_name;
-                """
-            ), params={"activity_name": activity_name}
-        )
-        activity_id = rows.fetchall()[0][0]
+        activity_id = self.get_activity_id_by_name(activity_name=activity_name)
 
         rows = self.session.execute(
             text(
