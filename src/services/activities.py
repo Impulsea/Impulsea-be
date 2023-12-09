@@ -21,6 +21,9 @@ class Activities:
         db_address_service: DBAddressService,
         db_leaderboard_service: DBLeaderboardService
     ):
+        '''
+        Reads files in /src/activities/.
+        '''
         self.db_address_service = db_address_service
         self.db_leaderboard_service = db_leaderboard_service
         self.activities = {}
@@ -43,7 +46,7 @@ class Activities:
                 logging.error(e)
 
     @staticmethod
-    def _import_functions_from_file(file_path):
+    def _import_functions_from_file(file_path: str) -> object:
         module_name = os.path.splitext(os.path.basename(file_path))[0]
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
@@ -51,7 +54,7 @@ class Activities:
         return module
 
     @staticmethod
-    def _process_config_file(root: str, entry: str, file: str):
+    def _process_config_file(root: str, entry: str, file: str) -> dict:
         file_path = os.path.join(root, entry, file)
         try:
             with open(file_path, 'r') as f:
@@ -62,14 +65,17 @@ class Activities:
             print(f"File not found: {e}")
 
     @staticmethod
-    def _process_py_file(root: str, entry: str, file: str):
+    def _process_py_file(root: str, entry: str, file: str) -> object:
         file_path = os.path.join(root, entry, file)
         try:
             return Activities._import_functions_from_file(file_path)
         except FileNotFoundError as e:
             print(f"File not found: {e}")
 
-    def get_all_activities(self):
+    def get_all_activities(self) -> list:
+        '''
+        Returns all activites with basic info.
+        '''
 
         all_activities = []
 
@@ -87,7 +93,10 @@ class Activities:
 
         return all_activities
 
-    def get_activity_stats(self, activity):
+    def get_activity_stats(self, activity: str) -> dict:
+        '''
+        Gets a statistics along with basic info for a given activity.
+        '''
         if activity not in self.activities:
             raise ActivityNotExistError(activity=activity)
         stats = self.activities[activity]["stats"].get_stats()
@@ -102,7 +111,10 @@ class Activities:
             **stats
         }
 
-    def get_activity_leaderboard(self, activity):
+    def get_activity_leaderboard(self, activity: str) -> list:
+        '''
+        Gets last scored wallets for a given activity.
+        '''
         if activity not in self.activities:
             raise ActivityNotExistError(activity=activity)
 
@@ -111,11 +123,38 @@ class Activities:
         return lb
 
     def get_activity_wallet_score(self, activity, address):
+        '''
+        Scores a wallet withing a given actity (aka campaign).
+        '''
+
+        # check if activity exists
         if activity not in self.activities:
             raise ActivityNotExistError(activity=activity)
+
+        # First, checks whether the wallet was recently scored.
+        try:
+            scores = self.db_address_service.load_cached_address(
+                activity_name=activity, address=address
+            )
+        except Exception as e:
+            logging.error(f'Cant load cache for {address}, {activity}')
+            logging.error(e)
+            scores = False
+
+        if scores:
+            return scores
+
+        # If there's no chached data, maked a DUNE request.
         try:
             scores = self.activities[activity]["wallet_checker"].get_wallet_score(address)
-            # TODO: add custom exception
+        except FailedQueryError:
+            raise FailedQueryError()
+        except Exception as e:
+            logging.error(e)
+            raise WalletScoringError()
+
+        # Saves a scored address into database.
+        try:
             self.db_address_service.save_scored_address(
                 address=address,
                 activity_name=activity,
@@ -124,9 +163,9 @@ class Activities:
                 competitors_activity=scores["Competitors Activity"],
                 sybil_likelihood=scores["Sybil Likelihood"]
             )
-            return scores
-        except FailedQueryError:
-            raise FailedQueryError()
         except Exception as e:
             logging.error(e)
-            raise WalletScoringError()
+            logging.error(f'Failed to save socred wallet: {address}, {activity}.')
+
+        # return scores
+        return scores
