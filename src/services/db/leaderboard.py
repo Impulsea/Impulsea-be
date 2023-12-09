@@ -18,21 +18,19 @@ class DBLeaderboardService(DBActivityService):
                 """
                 SELECT
                     wallet,
-                    program_engagement,
-                    protocol_activity,
-                    competitors_activity,
-                    sybil_likelihood
-                FROM (
-                    SELECT DISTINCT ON (wallet)
-                        wallet,
-                        protocol_activity, competitors_activity,
-                        program_engagement, sybil_likelihood, dt
+                    program_engagement, protocol_activity,
+                    competitors_activity, sybil_likelihood,
+                    program_engagement + protocol_activity +
+                        competitors_activity + sybil_likelihood AS total_xp
+                FROM
+                    (
+                    SELECT DISTINCT ON (wallet) *
                     FROM wallet_scorings
                     WHERE activity_id = :activity_id
-                    ORDER BY wallet
+                    ORDER BY wallet, dt DESC
                     LIMIT :n_rows
-                ) tmp
-                ORDER BY dt DESC;
+                    ) tmp
+                ORDER BY tmp.dt DESC;
                 """
             ), params={"activity_id": activity_id, "n_rows": n_rows}
         )
@@ -46,6 +44,6 @@ class DBLeaderboardService(DBActivityService):
                 "Protocol Activity": item[2],
                 "Competitors Activity": item[3],
                 "Sybil Likelihood": item[4],
-                "Total XP": item[1] + item[2] + item[3] + item[4]
+                "Total XP": item[5]
             })
         return lb

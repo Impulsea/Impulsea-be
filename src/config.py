@@ -1,5 +1,6 @@
 import os
 
+CACHING_TIME = int(os.getenv("CACHING_TIME", "60"))
 
 DUNE_API_KEY = os.getenv("DUNE_API_KEY", "")
 
